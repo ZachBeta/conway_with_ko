@@ -19,12 +19,16 @@ class Conway
   end
 
   def step
-    temp_board = @board
+    temp_board = Array.new(@board.length) { Array.new(@board[0].length, 0) }
+
     @board.each_with_index do |row, row_index|
       row.each_with_index do |col, col_index|
         if alive_with_few_neighbors(row_index,col_index)
-          p "#{row_index} #{col_index} #{temp_board[row_index][col_index]}"
           temp_board[row_index][col_index] = 0
+        elsif alive_with_too_many_neighbors(row_index, col_index)
+          temp_board[row_index][col_index] = 0
+        else
+          temp_board[row_index][col_index] = @board[row_index][col_index]
         end
       end
     end
@@ -49,8 +53,12 @@ class Conway
 
   private
 
+  def alive_with_too_many_neighbors(row_index,col_index)
+    cell_alive?(row_index, col_index) &&
+      live_neighbor_count(row_index,col_index) > 3
+  end
   def alive_with_few_neighbors(row_index,col_index)
     cell_alive?(row_index, col_index) &&
-      live_neighbor_count(row_index,col_index) == 1
+      live_neighbor_count(row_index,col_index) < 2
   end
 end

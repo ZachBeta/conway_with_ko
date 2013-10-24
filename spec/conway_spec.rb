@@ -5,21 +5,51 @@ describe Conway do
   let(:conway) { Conway.new }
 
   describe '#step' do
-    it 'handles step suches' do
-      conway.board = [[1,0],
-                      [0,0]]
-      conway.step
-      conway.board.should == [[0,0],
-                              [0,0]]
+    context 'given too few neighbors' do
+      it 'kills' do
+        conway.board = [[1,0,0],
+                        [0,0,0]]
+        conway.step
+        conway.board.should == [[0,0,0],
+                                [0,0,0]]
 
-      conway.board = [[0,0,0],
-                      [1,1,1],
-                      [0,0,0]]
-      p conway.live_neighbor_count(1,1)
-      conway.step
-      p conway.board
-      conway.cell_alive?(1,2).should == false
-      conway.cell_alive?(1,1).should == true
+        conway.board = [[0,0,0],
+                        [1,1,1],
+                        [0,0,0]]
+        conway.step
+        conway.cell_alive?(1,2).should == false
+        conway.cell_alive?(1,1).should == true
+      end
+    end
+
+    context 'given too many neighbbors' do
+      before do
+        conway.board = [[1,1,0],
+                        [1,1,1],
+                        [0,0,0]]
+
+        conway.step
+      end
+
+      it 'kills' do
+        conway.cell_alive?(1,1).should == false
+      end
+
+      it "doesn't kill other stuff" do
+        conway.cell_alive?(0,0).should == true
+        conway.cell_alive?(1,2).should == true
+      end
+    end
+
+    context 'given dead cell with exactly three neighbors' do
+      it 'births' do
+        conway.board = [[0,1,0],
+                        [1,0,1],
+                        [0,0,0]]
+        conway.step
+        p conway.board[1][1]
+        conway.cell_alive?(1,1) == true
+      end
     end
   end
 
@@ -56,8 +86,11 @@ describe Conway do
       conway.live_neighbor_count(1,1).should == 8
       conway.live_neighbor_count(0,1).should == 5
 
+      conway.board = [[0,0,0],
+                      [1,1,1],
+                      [0,0,0]]
 
-
+      conway.live_neighbor_count(1,1).should == 2
     end
   end
 
